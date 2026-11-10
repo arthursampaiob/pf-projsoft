@@ -8,19 +8,63 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Testar acesso a EC2
+      - name: Baixar codigo
+        uses: actions/checkout@v6
+
+      - name: Construir imagem Docker
+        run: docker build -t simulado-avaliacoes:latest .
+
+      - name: Empacotar imagem
+        run: docker save simulado-avaliacoes:latest | gzip > backend-image.tar.gz
+
+      - name: Enviar arquivos para EC2
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USER }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          source: "backend-image.tar.gz,compose.prod.yaml"
+          target: "/home/ubuntu/simulado-avaliacoes"
+          command_timeout: 10m
+
+      - name: Executar deploy
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.AWS_USER }}
           key: ${{ secrets.AWS_SSH_KEY }}
+          command_timeout: 10m
           script: |
             set -e
-            whoami
-            docker --version
-            docker compose version
+            cd /home/ubuntu/simulado-avaliacoes
+
+            docker load -i backend-image.tar.gz
+            rm -f backend-image.tar.gz
+
+            docker compose -f compose.prod.yaml up -d
+
+            status=$(curl \
+              --retry 20 \
+              --retry-connrefused \
+              --retry-delay 3 \
+              --silent \
+              --show-error \
+              --output /dev/null \
+              --write-out "%{http_code}" \
+              http://localhost:8081/avaliacoes)
+
+            if [ "$status" != "401" ]; then
+              docker compose -f compose.prod.yaml logs --tail=80 backend
+              exit 1
+            fi
+
+            docker compose -f compose.prod.yaml ps
