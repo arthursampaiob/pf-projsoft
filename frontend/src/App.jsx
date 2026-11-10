@@ -1,6 +1,8 @@
 import { useAuth0 } from '@auth0/auth0-react'
 import { useState } from 'react'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081'
+
 function App() {
   const {
     loginWithRedirect,
@@ -24,7 +26,7 @@ function App() {
      try {
        const token = await getAccessTokenSilently()
 
-       const resposta = await fetch('http://localhost:8081/avaliacoes', {
+       const resposta = await fetch(`${API_URL}/avaliacoes`, {
          headers: {
            Authorization: `Bearer ${token}`,
          },
@@ -52,7 +54,7 @@ function App() {
      try {
        const token = await getAccessTokenSilently()
 
-       const resposta = await fetch('http://localhost:8081/avaliacoes', {
+       const resposta = await fetch(`${API_URL}/avaliacoes`, {
          method: 'POST',
          headers: {
            Authorization: `Bearer ${token}`,
