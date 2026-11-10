@@ -54,6 +54,7 @@ jobs:
 
             status=$(curl \
               --retry 20 \
+              --retry-all-errors \
               --retry-connrefused \
               --retry-delay 3 \
               --silent \
