@@ -38,11 +38,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/avaliacoes")
-                        .hasAuthority("create:avaliacoes")
-                        .requestMatchers(HttpMethod.GET, "/avaliacoes")
-                        .hasAuthority("read:avaliacoes")
-                        .anyRequest().authenticated())
+                        .requestMatchers(HttpMethod.POST, "/tarefas")
+                        .hasAuthority("create:tarefas")
+                        .requestMatchers(HttpMethod.GET, "/tarefas")
+                        .hasAuthority("read:tarefas"))
                 .oauth2ResourceServer(oauth -> oauth
                         .jwt(jwt -> jwt
                                 .jwtAuthenticationConverter(jwtConverter)))

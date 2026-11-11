@@ -14,19 +14,20 @@ function App() {
     getAccessTokenSilently,
   } = useAuth0()
 
-   const [avaliacoes, setAvaliacoes] = useState([])
+   const [tarefas, settarefas] = useState([])
    const [mensagem, setMensagem] = useState('')
-   const [emailAvaliado, setEmailAvaliado] = useState('')
-   const [comentarios, setComentarios] = useState('')
-   const [nota, setNota] = useState('')
+   const [titulo, setTitulo] = useState('')
+   const [emailCriador, setEmailCriador] = useState('')
+   const [descricao, setDescricao] = useState('')
+   const [prioridade, setPrioridade] = useState('')
 
-   async function listarAvaliacoes() {
+   async function listarTarefas() {
      setMensagem('')
 
      try {
        const token = await getAccessTokenSilently()
 
-       const resposta = await fetch(`${API_URL}/avaliacoes`, {
+       const resposta = await fetch(`${API_URL}/tarefas`, {
          headers: {
            Authorization: `Bearer ${token}`,
          },
@@ -37,34 +38,33 @@ function App() {
        }
 
        const dados = await resposta.json()
-       setAvaliacoes(dados)
 
        if (dados.length === 0) {
-         setMensagem('Nenhuma avaliação cadastrada.')
+         setMensagem('Nenhuma tarefa cadastrada.')
        }
      } catch (erro) {
        setMensagem(erro.message)
      }
    }
 
-   async function cadastrarAvaliacao(event) {
+   async function cadastrarTarefa(event) {
      event.preventDefault()
      setMensagem('')
 
      try {
        const token = await getAccessTokenSilently()
 
-       const resposta = await fetch(`${API_URL}/avaliacoes`, {
+       const resposta = await fetch(`${API_URL}/tarefas`, {
          method: 'POST',
          headers: {
            Authorization: `Bearer ${token}`,
            'Content-Type': 'application/json',
          },
          body: JSON.stringify({
-           emailAvaliador: user.email,
-           emailAvaliado,
-           comentarios,
-           nota: Number(nota),
+           emailCriador: user.email,
+           titulo,
+           descricao,
+           prioridade: Number(prioridade),
          }),
        })
 
@@ -72,11 +72,12 @@ function App() {
          throw new Error(`Erro ao cadastrar: HTTP ${resposta.status}`)
        }
 
-       setEmailAvaliado('')
-       setComentarios('')
-       setNota('')
+       setEmailCriador('')
+       setTitulo('')
+       setDescricao('')
+       setPrioridade('')
 
-       await listarAvaliacoes()
+       await listarTarefas()
      } catch (erro) {
        setMensagem(erro.message)
      }
@@ -92,7 +93,7 @@ function App() {
 
   return (
     <main>
-      <h1>Sistema de Avaliações</h1>
+      <h1>Sistema de Tarefas</h1>
 
       {!isAuthenticated ? (
         <button onClick={() => loginWithRedirect()}>
@@ -102,37 +103,46 @@ function App() {
         <>
           <p>Conectado como: {user.email}</p>
 
-          <form onSubmit={cadastrarAvaliacao}>
-            <h2>Cadastrar avaliação</h2>
+          <form onSubmit={cadastrarTarefa}>
+            <h2>Cadastrar tarefa</h2>
 
             <label>
-              E-mail do avaliado:
+              E-mail do criador:
               <input
                 type="email"
-                value={emailAvaliado}
-                onChange={(event) => setEmailAvaliado(event.target.value)}
+                value={emailCriador}
+                onChange={(event) => setEmailCriador(event.target.value)}
                 required
               />
             </label>
 
             <label>
-              Comentários:
+              Título:
               <textarea
-                value={comentarios}
-                onChange={(event) => setComentarios(event.target.value)}
+                value={titulo}
+                onChange={(event) => setTitulo(event.target.value)}
                 required
               />
             </label>
 
             <label>
-              Nota:
+              Descrição:
+              <textarea
+                value={descricao}
+                onChange={(event) => setDescricao(event.target.value)}
+                required
+              />
+            </label>
+
+            <label>
+              Prioridade:
               <input
                 type="number"
                 min="0"
                 max="10"
                 step="1"
-                value={nota}
-                onChange={(event) => setNota(event.target.value)}
+                value={prioridade}
+                onChange={(event) => setPrioridade(event.target.value)}
                 required
               />
             </label>
@@ -140,19 +150,18 @@ function App() {
             <button type="submit">Cadastrar</button>
           </form>
 
-          <button onClick={listarAvaliacoes}>
-            Listar avaliações
+          <button onClick={listarTarefas}>
+            Listar tarefas
           </button>
 
           <p>{mensagem}</p>
 
           <ul>
-            {avaliacoes.map((avaliacao) => (
-              <li key={avaliacao.id}>
-                {avaliacao.emailAvaliador} avaliou {avaliacao.emailAvaliado}
-                {' — Nota: '}{avaliacao.nota}
-                {' — '}{avaliacao.comentarios}
-                {' — Data: '}{avaliacao.dataAvaliacao}
+            {tarefas.map((tarefa) => (
+              <li key={tarefa.id}>
+                {' — Prioridade: '}{tarefa.prioridade}
+                {' — '}{tarefa.titulo}
+                {' — '}{tarefa.descricao}
               </li>
             ))}
           </ul>

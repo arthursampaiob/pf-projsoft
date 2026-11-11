@@ -3,7 +3,7 @@ services:
     image: postgres:17
     restart: unless-stopped
     environment:
-      POSTGRES_DB: avaliacoes
+      POSTGRES_DB: tarefas
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -11,7 +11,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d avaliacoes"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tarefas"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -23,7 +23,7 @@ services:
       - "8082:8081"
     environment:
       SERVER_PORT: 8081
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/avaliacoes
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tarefas
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
     depends_on:
