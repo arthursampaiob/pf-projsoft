@@ -1,4 +1,4 @@
-name: simulado-avaliacoes
+name: pf-projsoft
 
 services:
   postgres:
@@ -17,11 +17,11 @@ services:
       retries: 10
 
   backend:
-    image: simulado-avaliacoes:latest
+    image: pf-projsoft:latest
     restart: unless-stopped
     mem_limit: 512m
     ports:
-      - "8081:8081"
+      - "8082:8081"
     environment:
       SERVER_PORT: 8081
       JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=60.0"
