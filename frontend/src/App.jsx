@@ -14,7 +14,7 @@ function App() {
     getAccessTokenSilently,
   } = useAuth0()
 
-   const [tarefas, settarefas] = useState([])
+   const [tarefas, setTarefas] = useState([])
    const [mensagem, setMensagem] = useState('')
    const [titulo, setTitulo] = useState('')
    const [emailCriador, setEmailCriador] = useState('')
@@ -38,6 +38,7 @@ function App() {
        }
 
        const dados = await resposta.json()
+       setTarefas(dados)
 
        if (dados.length === 0) {
          setMensagem('Nenhuma tarefa cadastrada.')
