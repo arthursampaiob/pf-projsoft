@@ -55,7 +55,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://simulado-af-projsoft.vercel.app"
+                "https://pf-projsoft.vercel.app"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
         configuration.setAllowedHeaders(
